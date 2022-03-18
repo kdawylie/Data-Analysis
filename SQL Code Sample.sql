@@ -1,3 +1,5 @@
+--Unioning Task and Incident Tables so all data is represented
+
 WITH cte AS (
     SELECT opened_at,
            opened_by,
@@ -36,9 +38,16 @@ WITH cte AS (
             
 ),
 
+-- Using another cte to join employees to ensure proper population of assignment group employees
+
 emps AS (
          SELECT name AS name_raw,
                 CONCAT(
+                       
+                       -- These 4 employees go by different names than is represented in the directory, so we need to make sure
+                       -- their data is populated by adjusting their names
+                       -- Otherwise, name data is cleaned using split_part to make it more readable
+                       
                        CASE
                             WHEN TRIM(name) = 'Nameson1. Name1 N1.' THEN 'Namey1'
                             WHEN TRIM(name) = 'Nameson2. Name2 N2.' THEN 'Namey2'
@@ -65,7 +74,7 @@ emps AS (
 final AS (
             SELECT a.*,
                    b.email AS agent_email,
-                   b.manage_name,
+                   b.manager_name,
                    b.manager_email,
                    b.agent_location,
             CASE
